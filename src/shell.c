@@ -3,6 +3,7 @@
 #include "clib.h"
 #include <string.h>
 #include "fio.h"
+#include "dir.h"
 #include "filesystem.h"
 
 #include "FreeRTOS.h"
@@ -62,18 +63,28 @@ int parse_command(char *str, char *argv[]){
 }
 
 void ls_command(int n, char *argv[]){
-    fio_printf(1,"\r\n"); 
+    fio_printf(1,"\r\n");
     int dir;
-    if(n == 0){
+    if(n == 1){
         dir = fs_opendir("");
-    }else if(n == 1){
+    }else if(n == 2){
         dir = fs_opendir(argv[1]);
-        //if(dir == )
     }else{
         fio_printf(1, "Too many argument!\r\n");
         return;
     }
-(void)dir;   // Use dir
+    if( dir == OPENDIR_NOTFOUNDFS ){
+        fio_printf(1, "No such directory : %s\r\n",argv[1]);
+        return;
+    }else{
+       char buf[128];
+       int count = 0;
+       while(dir_next(dir,buf,128) == 1){
+            fio_printf(1, "%s\r\n",buf);
+            ++count;
+       }
+        fio_printf(1, "Total %d\r\n",count);
+    }
 }
 
 int filedump(const char *filename){

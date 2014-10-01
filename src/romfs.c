@@ -2,11 +2,13 @@
 #include <FreeRTOS.h>
 #include <semphr.h>
 #include <unistd.h>
+#include "dir.h"
 #include "fio.h"
 #include "filesystem.h"
 #include "romfs.h"
 #include "osdebug.h"
 #include "hash-djb2.h"
+#include "clib.h"
 
 struct romfs_fds_t {
     const uint8_t * file;
@@ -14,7 +16,20 @@ struct romfs_fds_t {
     uint32_t size;
 };
 
+typedef struct romfs_dirstream {
+    uint32_t hash;    
+    uint8_t * cursor;
+}romfs_dirstream ;
+
+struct romfs_dirent {
+    // inode
+    uint32_t offset;
+    //uint8_t type;
+    char *name;
+};
+
 static struct romfs_fds_t romfs_fds[MAX_FDS];
+static struct romfs_dirstream romfs_dirstreams[MAX_DIRS];
 
 static uint32_t get_unaligned(const uint8_t * d) {
     return ((uint32_t) d[0]) | ((uint32_t) (d[1] << 8)) | ((uint32_t) (d[2] << 16)) | ((uint32_t) (d[3] << 24));
@@ -104,7 +119,35 @@ static int romfs_open(void * opaque, const char * path, int flags, int mode) {
     return r;
 }
 
+static int romfs_next(void * opaque, void * buf, size_t bufsize){
+    romfs_dirstream * d = (romfs_dirstream *) opaque;
+    uint8_t * meta;
+    for (meta = d -> cursor; get_unaligned(meta + 4); meta += get_unaligned(meta + 4) + 12) {
+        if (get_unaligned(meta + 8) == d -> hash) {
+            memcpy(buf, meta + 12, strlen((char*)meta+12) + 1 );
+            d -> cursor = meta + get_unaligned(meta + 4) + 12;
+            return 1;
+        }
+    }
+    return 0;
+}
+
+static int romfs_close(void * opaque){
+    return 0;
+}
+
+static int romfs_open_dir(void * opaque, const char *path){
+    uint32_t h = hash_djb2((const uint8_t *) path, -1);
+    uint8_t * romfs = (uint8_t *) opaque;
+
+    int r = dir_open(romfs_next, romfs_close, opaque);
+    romfs_dirstreams[r].hash = h;
+    romfs_dirstreams[r].cursor = romfs;
+    dir_set_opaque(r,romfs_dirstreams + r); 
+    return r;
+}
+
 void register_romfs(const char * mountpoint, const uint8_t * romfs) {
 //    DBGOUT("Registering romfs `%s' @ %p\r\n", mountpoint, romfs);
-    register_fs(mountpoint, romfs_open, NULL, (void *) romfs);
+    register_fs(mountpoint, romfs_open, romfs_open_dir, (void *) romfs);
 }

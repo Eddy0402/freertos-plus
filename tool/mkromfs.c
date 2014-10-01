@@ -54,7 +54,7 @@ void processdir(DIR * dirp, const char * curpath, FILE * outfile, const char * p
             closedir(rec_dirp);
         } else {
             hash = hash_djb2((const uint8_t *) ent->d_name, cur_hash);
-            hash_path = hash_djb2((const uint8_t *) curpath, cur_hash);
+            hash_path = cur_hash; 
             infile = fopen(fullpath, "rb");
             if (!infile) {
                 perror("opening input file");

@@ -29,36 +29,37 @@ static int dir_is_open_int(int dird){
 static int dir_finddird(){
     int i;
     for(i = 0; i < MAX_DIRS; ++i){
-        if(!dir_is_open(i))return i;
+        if(!dir_is_open_int(i))return i;
     }
     return -1;
 }
 
 int dir_is_open(int dird){
     int r;
-    xSemaphoreTake(dir_sem, portMAX_DELAY); 
+//    xSemaphoreTake(dir_sem, portMAX_DELAY); 
     r = dir_is_open_int(dird);
-    xSemaphoreGive(dir_sem);
+//    xSemaphoreGive(dir_sem);
     return r;
 }
 
 int dir_open(dirnext_t dirnext, dirclose_t dirclose, void * opaque){
     int dird;
 
-    xSemaphoreTake(dir_sem, portMAX_DELAY); 
+//    xSemaphoreTake(dir_sem, portMAX_DELAY); 
     dird = dir_finddird();
-    if(dird > 0){
+    if(dird >= 0){
         dirds[dird].dirnext = dirnext;
         dirds[dird].dirclose = dirclose;
         dirds[dird].opaque = opaque;
     }
-    xSemaphoreGive(dir_sem);
+//    xSemaphoreGive(dir_sem);
 
     return dird;
 }
 
+//Successful read : 1
 int dir_next(int dird, void * buf, size_t bufsize){
-    if(dir_is_open_int(dird)){
+    if(dir_is_open(dird)){
         if(dirds[dird].dirnext){
             return dirds[dird].dirnext(dirds[dird].opaque, buf, bufsize); 
         }else{
@@ -75,9 +76,9 @@ int dir_close(int dird){
         if(dirds[dird].dirclose){
             r = dirds[dird].dirclose(dirds[dird].opaque); 
         }
-        xSemaphoreTake(dir_sem, portMAX_DELAY); 
+//        xSemaphoreTake(dir_sem, portMAX_DELAY); 
         memset(dirds + dird,0,sizeof(dirdef_t));
-        xSemaphoreGive(dir_sem);
+//        xSemaphoreGive(dir_sem);
         return r;
     }else{
         return ENOTOPEN;

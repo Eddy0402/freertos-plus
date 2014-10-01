@@ -13,6 +13,7 @@ enum open_types_t {
 };
 
 #define MAX_FDS 32
+#define MAX_DIRS 32
 
 typedef ssize_t (*fdread_t)(void * opaque, void * buf, size_t count);
 typedef ssize_t (*fdwrite_t)(void * opaque, const void * buf, size_t count);

@@ -1,6 +1,7 @@
 #include "osdebug.h"
 #include "filesystem.h"
 #include "fio.h"
+#include "dir.h"
 
 #include <stdint.h>
 #include <string.h>
@@ -63,8 +64,28 @@ int fs_open(const char * path, int flags, int mode) {
     return -2;
 }
 
+static int root_next(void * opaque, void * buf, size_t bufsize){
+    static int now = 0;
+    if(now == 0){
+        memcpy(buf,"dev",6 > bufsize ? bufsize : 6);
+        now = 1;
+        return 1; 
+    }else if(now == 1){
+        memcpy(buf,"romfs",6 > bufsize ? bufsize : 6);
+        now = 2;
+        return 1; 
+    }else{
+        now = 0;
+        return 0; 
+    }
+}
+
+static int root_close(void * opaque){
+    return 0;
+}
+
 static int root_opendir(){
-    return OPENDIR_NOTFOUNDFS;        
+    return dir_open(root_next,root_close,NULL);
 }
 
 int fs_opendir(const char * path){
