@@ -13,6 +13,47 @@
 typedef int (*fs_open_t)(void * opaque, const char * fname, int flags, int mode);
 typedef int (*fs_open_dir_t)(void * opaque, const char * fname);
 
+struct filesystem_type{
+    struct super_block *(*get_sb)(int,char *, void *);
+    void (*kill_sb)(struct super_block *);
+};
+
+struct super_block{
+    struct dentry    *s_root;
+    struct super_operations *s_op;
+    struct inode *s_inodes;
+};
+
+struct super_operations{
+    struct inode *(*alloc_inode)(struct super_block *sb);
+    void (*destroy_inode)(struct inode*);
+    int (*write_inode)(struct inode*);
+    void (*write_super)(struct super_block *sb);
+};
+
+struct inode{
+    uint32_t i_no;
+    uint32_t i_mode;
+    uint32_t i_link;
+    uint32_t i_size;
+    union {
+        uint32_t i_data_off;
+        uint8_t *i_data;
+    }data;
+    struct inode_operations *i_op;
+    struct super_block *i_sb;
+};
+
+struct inode_operations{
+    int (*create)(struct inode *,struct dentry *,int);
+    struct dentry *(*lookup)(struct inode *,struct dentry *);
+    int (*link)(struct dentry *,struct inode *,struct dentry);
+    int (*unlink) (struct inode *, struct dentry *);
+    int (*mkdir) (struct inode *, struct dentry *, int);
+    int (*rmdir) (struct inode *, struct dentry *);
+};
+
+
 /* Need to be called before using any other fs functions */
 __attribute__((constructor)) void fs_init();
 
