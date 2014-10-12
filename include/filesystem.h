@@ -13,9 +13,9 @@
 typedef int (*fs_open_t)(void * opaque, const char * fname, int flags, int mode);
 typedef int (*fs_open_dir_t)(void * opaque, const char * fname);
 
-struct filesystem_type{
-    struct super_block *(*get_sb)(int,char *, void *);
-    void (*kill_sb)(struct super_block *);
+struct file_system_type {
+    struct super_block *(*get_sb) (int flags, char *name, void *data);
+    void (*kill_sb) (struct super_block *);
 };
 
 struct super_block{
@@ -27,14 +27,18 @@ struct super_block{
 struct super_operations{
     struct inode *(*alloc_inode)(struct super_block *sb);
     void (*destroy_inode)(struct inode*);
-    int (*write_inode)(struct inode*);
+    void (*write_inode)(struct inode*);
     void (*write_super)(struct super_block *sb);
 };
 
+#define DT_REG 1
+#define DT_DIR 2
+
 struct inode{
     uint32_t i_no;
+    uint32_t i_type;
     uint32_t i_mode;
-    uint32_t i_link;
+    uint32_t i_nlink;
     uint32_t i_size;
     union {
         uint32_t i_data_off;

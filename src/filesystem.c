@@ -9,30 +9,6 @@
 
 #define MAX_FS 16
 
-struct file_system_type {
-    struct super_block *(*get_sb) (int flags, char *name, void *data);
-    void (*kill_sb) (struct super_block);
-};
-
-
-struct dentry{
-    struct inode *d_inode;
-    struct super_block *d_sb;
-    uint32_t d_mounted;
-};
-
-struct dentry_operations{
-    int (*d_hash) (struct dentry *,char *);
-    int (*d_compare) (struct dentry *, char *, char *);
-    int (*d_delete) (struct dentry *dentry);
-};
-
-struct dirent{
-    uint32_t inode;
-    uint32_t hash;
-    char d_name[56];
-};
-
 struct fs_t {
     uint32_t hash;
     fs_open_t cb;
