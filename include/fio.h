@@ -2,6 +2,7 @@
 #define __FIO_H__
 
 #include <stdio.h>
+#include <stdint.h>
 
 enum open_types_t {
     O_RDONLY = 0,
@@ -15,10 +16,29 @@ enum open_types_t {
 #define MAX_FDS 32
 #define MAX_DIRS 32
 
+struct dirent;
+struct inode;
+
 typedef ssize_t (*fdread_t)(void * opaque, void * buf, size_t count);
 typedef ssize_t (*fdwrite_t)(void * opaque, const void * buf, size_t count);
 typedef off_t (*fdseek_t)(void * opaque, off_t offset, int whence);
 typedef int (*fdclose_t)(void * opaque);
+
+struct file{
+    struct dentry *f_dentry;
+    struct file_operations *f_op;
+    uint32_t f_flags;
+    uint32_t f_mode;
+    uint32_t f_pos;
+};
+
+struct file_operations{
+    uint32_t (*llseek)(struct file *,uint32_t off,int origin);
+    uint32_t (*read)(struct file *,char *buf, uint32_t count, uint32_t offset);
+    uint32_t (*write)(struct file *,char *buf, uint32_t count, uint32_t offset);
+    int (*readdir)(struct file *, struct dirent* entry, struct dirent ** result);
+    int (*open)(struct inode *inode,struct file *file);
+};
 
 struct fddef_t {
     fdread_t fdread;
