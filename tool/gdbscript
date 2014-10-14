@@ -1,6 +1,7 @@
 file build/main.elf
 target remote :3333
-
-b main
-
+set arm force-mode thumb
+layout asm
+layout reg
+b level1
 c
