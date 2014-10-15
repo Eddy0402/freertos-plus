@@ -18,9 +18,12 @@ struct file_system_type {
     void (*kill_sb) (struct super_block *);
 };
 
+struct dentry_operations;
+
 struct super_block{
     struct dentry    *s_root;
     struct super_operations *s_op;
+    struct dentry_operations *s_d_op; /* default dentry operations */
     struct inode *s_inodes;
 };
 
