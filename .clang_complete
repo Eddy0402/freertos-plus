@@ -1,0 +1,1 @@
+-Iinclude -Ifreertos/libraries/CMSIS/CM3/CoreSupport -Ifreertos/libraries/STM32F10x_StdPeriph_Driver/inc -Ifreertos/libraries/CMSIS/CM3/DeviceSupport/ST/STM32F10x -Ifreertos/libraries/FreeRTOS/include/ -Ifreertos/libraries/FreeRTOS/portable/GCC/ARM_CM3/
