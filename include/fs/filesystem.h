@@ -44,6 +44,7 @@ struct inode{
     uint32_t i_nlink;
     uint32_t i_size;
     struct inode_operations *i_op;
+    struct file_operations *i_fop;
     struct super_block *i_sb;
 };
 
@@ -55,6 +56,7 @@ struct inode_operations{
     int (*mkdir) (struct inode *, struct dentry *, int);
     int (*rmdir) (struct inode *, struct dentry *);
 };
+
 
 
 /* Need to be called before using any other fs functions */
