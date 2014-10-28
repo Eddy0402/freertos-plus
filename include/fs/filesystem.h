@@ -24,7 +24,7 @@ struct super_block{
     struct dentry    *s_root;
     struct super_operations *s_op;
     struct dentry_operations *s_d_op; /* default dentry operations */
-    struct inode *s_inodes;
+    void *opaque;
 };
 
 struct super_operations{
@@ -43,10 +43,6 @@ struct inode{
     uint32_t i_mode;
     uint32_t i_nlink;
     uint32_t i_size;
-    union {
-        uint32_t i_data_off;
-        uint8_t *i_data;
-    }data;
     struct inode_operations *i_op;
     struct super_block *i_sb;
 };
