@@ -2,7 +2,7 @@
 #define __MOUNT_H__
 
 #include <stdint.h>
-#include "list.h"
+#include "link_list.h"
 
 struct vfsmount{
     struct vfsmount *mnt_parent;
