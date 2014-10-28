@@ -27,17 +27,21 @@ FREERTOS_INC = $(FREERTOS_SRC)/include/
 FREERTOS_PORT_INC = $(FREERTOS_SRC)/portable/GCC/ARM_$(ARCH)/
 
 OUTDIR = build
-SRCDIR = src\
+SRCDIR = \
+         src\
+         src/fs\
          $(CMSIS_LIB)/CoreSupport \
          $(STM32_LIB)/src \
          $(CMSIS_PLAT_SRC) \
-	 $(FREERTOS_SRC)
-INCDIR = include \
+         $(FREERTOS_SRC)
+INCDIR = \
+         include \
+         include/fs \
          $(CMSIS_LIB)/CoreSupport \
          $(STM32_LIB)/inc \
          $(CMSIS_PLAT_SRC) \
-	 $(FREERTOS_INC) \
-	 $(FREERTOS_PORT_INC)
+         $(FREERTOS_INC) \
+         $(FREERTOS_PORT_INC)
 INCLUDES = $(addprefix -I,$(INCDIR))
 DATDIR = data
 TOOLDIR = tool
