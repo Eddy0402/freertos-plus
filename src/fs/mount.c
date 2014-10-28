@@ -8,7 +8,8 @@ __attribute__((constructor)) void vfs_init(){
         .mnt_parent = NULL,
         .mnt_mountpoint = NULL,
         .mnt_root = NULL,
-        .mnt_sb = NULL
+        .mnt_sb = NULL,
+        .mnt_list = LIST_HEAD_INIT(root.mnt_list),
     };
     mnt_namespace.root = &root;
 }
